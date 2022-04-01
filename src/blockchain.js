@@ -5,8 +5,6 @@ import {Semaphore} from './semaphore';
 export class BlockChain extends Observer {
 
     #chain = []
-    queueOfBlocksToAdd = []
-    t = null
     semaphor
     difficulty
 
@@ -35,6 +33,15 @@ export class BlockChain extends Observer {
         return null
     }
 
+    async getByHash(id) {
+        for await(let block of this.#chain) {
+            const blockHash = await block.getHash()
+            if (id === blockHash) {
+                return block
+            }
+        }
+    }
+
     async #validateChain() {
         let i = 0
         for await (let block of this.#chain) {
@@ -55,7 +62,7 @@ export class BlockChain extends Observer {
         return true;
     }
 
-    async add(...args) {
+    add(...args) {
         this.semaphor.$call(this.$add, ...args)
     }
 
@@ -77,7 +84,7 @@ export class BlockChain extends Observer {
         block.hash = await block.mine(this.difficulty);
         Object.freeze(block)
         this.#chain.push(block)
-        this.#validateChain()
+        await this.#validateChain()
         this.next(this.#chain)
 
     }

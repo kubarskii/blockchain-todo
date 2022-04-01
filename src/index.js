@@ -1,112 +1,42 @@
-import {Block} from './block'
 import {BlockChain} from './blockchain'
+import {Block} from "./block";
 
-const btn = document.getElementById('create')
-const list = document.getElementById('task-list')
+const uid = () => Math.random().toString().slice(2)
+
+const list = document.getElementById('list')
 
 const chain = new BlockChain({difficulty: 4})
 
 const render = (arr) => {
+    const pendingTasks = chain.semaphor.requests;
     list.innerHTML = ''
     list.innerHTML = arr.reduce((acc, curr) => {
         return `${acc}<li>${JSON.stringify(curr)}</li>`
-    }, '')
+    }, '').concat(pendingTasks.reduce((acc, curr) => {
+        return `${acc}<li style="font-size: 6px" ><div class="spinner spinner--gray"></div></li>`
+    }, ''))
 }
 
 chain.subscribe((data) => {
     console.log(data)
-    render(data.map(el => {
-        return el?._data?.state || ''
+    render(data.slice(1).map(el => {
+        return el?._data
     }))
 })
 
-/**
- * Contract:
- * {
- *     operation: 'CREATE' | 'DELETE' | 'UPDATE'
- *     change: {Action},
- *     prevState: {S}
- *     state: {S}
- * }
- * */
+const form = document.getElementById('todo-form')
 
-const actionTypes = {
-    TODO_MINING: 'TODO_MINING',
-    TODO_CREATE: 'TODO_CREATE',
-    TODO_DELETE: 'TODO_DELETE',
-    TODO_UPDATE: 'TODO_UPDATE',
-}
-
-const todoActions = {
-    create: (payload) => ({
-        type: actionTypes.TODO_CREATE,
-        payload
-    }),
-    delete: (id) => ({
-        type: actionTypes.TODO_DELETE,
-        payload: id
-    }),
-    update: (id, value) => ({
-        type: actionTypes.TODO_UPDATE,
-        payload: {
-            id,
-            value
-        }
-    }),
-}
-
-/**
- * @var {Array<ToDo>} defaultTodos.items
- * */
-const defaultTodos = {
-    items: []
-}
-
-const todoReducer = (state = chain.value, action) => {
-    const {type, payload} = action
-
-    switch (type) {
-        case actionTypes.TODO_CREATE: {
-            return {
-                ...state,
-                items: [
-                    ...state.items,
-                    payload
-                ]
+form.addEventListener('submit', (e) => {
+    e.preventDefault()
+    const {task} = form
+    if (task) {
+        chain.add(new Block({
+            operation: 'CREATE',
+            data: {
+                task: task.value,
+                id: uid()
             }
-        }
-        case actionTypes.TODO_UPDATE: {
-            return {
-                ...state,
-                items: [
-                    ...state.items.slice(0, id),
-                    payload,
-                    ...state.items.slice(id + 1, state.items.length)
-                ]
-            }
-        }
-        case actionTypes.TODO_DELETE: {
-            return {
-                ...state,
-                items: [
-                    ...state.items.slice(0, id),
-                    ...state.items.slice(id + 1, state.items.length)
-                ]
-            }
-        }
-        default:
-            state
+        }))
+        task.value = ''
     }
-
-}
-
-
-btn.addEventListener('click', () => {
-    const block = new Block({
-        operation: 'CREATE',
-        state: Math.random(),
-    })
-    chain.add(block)
 })
-
-
