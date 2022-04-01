@@ -1,0 +1,15 @@
+@import "reset.css";
+@import "grid.css";
+@import "button.css";
+@import "form.css";
+@import "spinner.css";
+
+:root {
+    --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    --default-black: #212529;
+}
+
+body {
+    font-family: var(--font);
+    color: var(--default-black);
+}

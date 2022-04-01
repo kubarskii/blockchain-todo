@@ -3,7 +3,6 @@ export class Block {
     _hash
     _prevHash
     _timestamp
-    isHashCalculating = false
     _nonce = 0
 
     /**
@@ -76,12 +75,10 @@ export class Block {
                 ""
         }
 
-        const tArr = new TextEncoder().encode(stringData + this._nonce)
+        const tArr = new TextEncoder().encode(stringData + this.prevHash + this._nonce)
         const hashBuffer = await crypto.subtle.digest("SHA-256", tArr)
         const hashArr = Array.from(new Uint8Array(hashBuffer))
-        const hash = hashArr.map(byte => byte.toString(16).padStart(2, '0')).join('')
-
-        return hash
+        return hashArr.map(byte => byte.toString(16).padStart(2, '0')).join('')
     }
 
     async mine(difficulty = 2) {

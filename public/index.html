@@ -4,15 +4,30 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-
+    <link rel="stylesheet" media="print" href="css/style.css" onload="this.media='all'">
+    <title>Blockchain TODO</title>
     <script src="index.js" defer></script>
 
 </head>
 <body>
 
-<button id="create">Create</button>
-<ul id="task-list"></ul>
+<div class="container">
+    <div id="list"></div>
+    <form id="todo-form">
+        <label class="form-label" for="form-task">Task:</label>
+        <div class="row">
+            <div class="col-sm-11">
+                <input type="text" class="form-control" name="task" id="form-task"
+                       placeholder="Type task here...">
+            </div>
+            <div class="col-sm-1 x-end">
+                <input type="submit" class="btn btn--primary" value="Add">
+            </div>
+        </div>
+    </form>
+
+</div>
+
 
 </body>
 </html>
